@@ -1,4 +1,4 @@
-using AdvertisingKHAI.Models.DataBaseContext;
+﻿using AdvertisingKHAI.Models.DataBaseContext;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +10,18 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationContext>(options =>
 {
     options.UseSqlite("Data Source=helloapp.db");
+});
+
+builder.Services.AddAuthentication("CookieAuthentication")
+    .AddCookie("CookieAuthentication", options =>
+    {
+        options.Cookie.Name = "CookieAuthentication";
+        options.LoginPath = "/Authorization/Login"; // Путь к странице входа
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
 });
 
 var app = builder.Build();
@@ -35,6 +47,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

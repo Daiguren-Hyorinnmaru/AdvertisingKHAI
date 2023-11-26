@@ -6,6 +6,6 @@ namespace AdvertisingKHAI.Models.DataBaseContext
     {
         public int ID { get; set; }
         public required string Name { get; set; }
-        public List<Banner> Baners { get; set; } = new();
+        public List<Banner> Banners { get; set; } = new();
     }
 }

@@ -79,7 +79,7 @@ namespace AdvertisingKHAI.Models.DataBaseContext
                     SaveChanges();
                 }
 
-                category = Categories.FirstOrDefault(c => c.Name == "темн.зеленый-фиолетовый-темн.розовый");
+                category = Categories.FirstOrDefault(c => c.Name == "черный-красный-темн.красный");
                 if (category != null)
                 {
                     byte[] imageData3 = File.ReadAllBytes("wwwroot/banner3.jpg");

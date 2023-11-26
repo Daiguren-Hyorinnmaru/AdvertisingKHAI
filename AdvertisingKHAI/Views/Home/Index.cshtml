@@ -1,8 +1,82 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model AdvertisingKHAI.Models.Home.Index
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Вміст сторінки -->
+<div id="banner-container">
+    <!-- Список компаній -->
+    <div id="categoryList">
+        <h2>Список категорій</h2>
+        <ul id="categoryUl"></ul>
+    </div>
+
+    <!-- Банер -->
+    <div id="banner">
+        <img id="imageId" src="banner1.jpg" alt="Рекламний банер">
+    </div>
 </div>
+
+<!-- Таймер для зміни контенту банера (в даному прикладі кожні 5 секунд) -->
+<script>
+    var imageElement = document.getElementById('imageId');
+    var categoryNames = @Html.Raw(Json.Serialize(Model.CategoryNames));
+    var bannerContent = @Html.Raw(Json.Serialize(Model.BannerContent));
+
+    var currentCategoryIndex = 0;
+    var currentBannerIndex = 0;
+
+    function nextBanner() {
+        // Исправление: обновление индекса баннера внутри текущей категории
+        currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
+
+        var currentImage = document.getElementById('imageId');
+
+        // Обновление src из модели
+        currentImage.src = bannerContent[currentCategoryIndex][currentBannerIndex];
+    }
+
+
+    // Оновлення списку категорій
+    function updateCategoryList() {
+        var categoryUl = document.getElementById('categoryList').getElementsByTagName('ul')[0];
+        categoryUl.innerHTML = ''; // Очистити список перед оновленням
+
+
+        // Створити кнопку для кожної категорії
+        categoryNames.forEach(function (category, index) {
+            var li = document.createElement('li');
+            var button = document.createElement('button');
+            button.textContent = category;
+
+            // Додати стилі до кнопок
+            button.style.backgroundColor = 'none';
+            button.style.border = 'none';
+            button.style.padding = '0';
+            button.style.fontSize = '16px';
+            button.style.cursor = 'pointer';
+            button.style.opacity = '0.7';
+            button.style.transition = 'opacity 0.3s ease';
+
+            button.onclick = function () {
+                changeCategory(index);
+            };
+
+            li.appendChild(button);
+            categoryUl.appendChild(li);
+        });
+    }
+
+    // Викликати функцію для початкового оновлення списку категорій
+    updateCategoryList();
+
+    function changeCategory(categoryIndex) {
+        currentCategoryIndex = categoryIndex;
+        currentBannerIndex = 0;
+        updateBanner();
+    }
+
+    function updateBanner() {
+        imageElement.src = bannerContent[currentCategoryIndex][currentBannerIndex];
+        currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
+    }
+
+    setInterval(nextBanner, 1000);
+</script>

@@ -1,0 +1,28 @@
+﻿@if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+{
+    <div class="error-message">
+        <p>@ViewData["ErrorMessage"]</p>
+    </div>
+}
+
+<form class="form" asp-action="Login" asp-controller="Authorization" method="post">
+    <label for="companyName">Назва компанії (від 3 до 50 символів, тільки літери):</label>
+    <input type="text" id="Name" name="Name" pattern="[A-Za-zА-Яа-яЁёіІїЇєЄґҐ\s]{3,50}" title="Введіть від 3 до 50 символів, тільки літери" required>
+
+    <label for="email">Електронна пошта:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Пароль (мінімум 8 символів):</label>
+    <input type="password" id="password" name="password" pattern=".{4,}" title="Введіть мінімум 8 символів" required>
+
+    <button type="submit">Увійти</button>
+</form>
+
+<div class="register-link">
+    <p>
+        Не маєте облікового запису?
+        <a style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Registration">
+            Зареєструйтесь тут
+        </a>.
+    </p>
+</div>

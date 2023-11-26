@@ -1,0 +1,45 @@
+﻿﻿#banner-container {
+    display: flex;
+    margin: 0 auto; /* Автоматичні бокові відступи для центрування */
+    justify-content: center; /* Центрування по горизонталі */
+    align-items: flex-start; /* Центрування по вертикалі зверху */
+}
+
+#banner {
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+    margin-bottom: 16px;
+    border-radius: 4px;
+}
+
+#companyList {
+    border-radius: 4px;
+    margin-left: 20px; /* Додаємо відступ зліва */
+    padding: 20px; /* Задаємо внутрішній відступ */
+}
+
+    #companyList h2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    #companyList ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #companyList li {
+        margin-bottom: 8px;
+        text-align: left; /* Вирівнювання тексту вліво */
+    }
+
+    #companyList button {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 16px;
+        cursor: pointer;
+        opacity: 0.7; /* Прозорість кнопки */
+    }
