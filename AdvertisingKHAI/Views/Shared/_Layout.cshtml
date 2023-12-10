@@ -33,11 +33,10 @@
             <div class="menu">
                 <ul>
                     @if (User.Identity != null)
-                    {
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li id="companyInfo">
-                                Company name: <span class="tooltip">@User.Identity.Name</span>
+                                Company name: <span class="tooltip"></span>
                             </li>
                             <li>
                                 <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Account" asp-action="Index">
@@ -50,20 +49,19 @@
                                 </a>
                             </li>
                         }
+                        else
+                        {
+                            <li>
+                                <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Login">
+                                    Авторизація
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Registration">
+                                    Реєстрація
+                                </a>
+                            </li>
                         }
-                    else
-                    {
-                        <li>
-                            <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Login">
-                                Авторизація
-                            </a>
-                        </li>
-                        <li>
-                            <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Registration">
-                                Реєстрація
-                            </a>
-                        </li>
-                    }
                 </ul>
             </div>
         </div>
@@ -77,21 +75,21 @@
 </html>
 
 <script>
+    //popup on hover
     $(document).ready(function () {
         $("#companyInfo").hover(function () {
             $.ajax({
                 url: "/Account/GetCompanyInfo",
                 type: "GET",
                 success: function (data) {
-                    // При успешном получении данных, отобразить их во всплывающем окне
                     var tooltipText = "";
 
-                    // Перебираем массив строк и добавляем их к tooltipText
+                    //all string in json and add to tooltipText
                     data.forEach(function (item) {
                         tooltipText += item + "<br>";
                     });
 
-                    // Вместо text() используем html(), чтобы поддерживать переносы строк
+                    //line break
                     $(".tooltip").html(tooltipText);
                 },
                 error: function () {

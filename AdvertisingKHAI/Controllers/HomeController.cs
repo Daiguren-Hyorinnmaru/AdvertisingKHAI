@@ -9,43 +9,46 @@ namespace AdvertisingKHAI.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly ApplicationContext _context;
 
-        public HomeController(ApplicationContext context, ILogger<HomeController> logger)
+        public HomeController(ApplicationContext context)
         {
-            _logger = logger;
             _context = context;
         }
 
         public IActionResult Index()
         {
-            // Отримання масиву categoryNames з джерела даних (наприклад, з бази даних)
+            //all category
             List<string> categoryNames = _context.Categories.Select(c => c.Name).ToList();
 
+            //all banners by category
             List<List<byte[]>> bannerContent = _context.Categories
             .Include(c => c.Banners)
             .Select(c => c.Banners.Select(b => b.ImageData).ToList())
             .ToList();
 
-            List<List<string>> bannerStringContent = new List<List<string>>();
 
+            //all banners by category
+            List<List<string>> bannerStringContent = new();
+
+            //create data banner in string for user
             foreach (List<byte[]> innerList in bannerContent)
             {
-                List<string> convertedInnerList = new List<string>();
+                //list for category
+                List<string> convertedInnerList = new();
                 foreach (byte[] item in innerList)
                 {
                     string base64String = "data:image/jpg;base64," + Convert.ToBase64String(item);
                     convertedInnerList.Add(base64String);
                 }
-                //Console.WriteLine(convertedInnerList.Count);
                 bannerStringContent.Add(convertedInnerList);
             }
 
-            List<List<string>> bannerContentToModel = new List<List<string>>();
-            List<string> categoryNamesToModel = new List<string>();
+            List<List<string>> bannerContentToModel = new();
+            List<string> categoryNamesToModel = new();
 
-            for (int i = 0; i < bannerStringContent.Count(); i++)
+            //delete null category
+            for (int i = 0; i < bannerStringContent.Count; i++)
             {
                 if (bannerStringContent[i].Count > 0)
                 {

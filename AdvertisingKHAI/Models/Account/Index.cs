@@ -4,13 +4,11 @@
     {
         public List<string> CategoryNames { get; set; }
         public List<List<string>> BannerData { get; set; }
-        public List<List<int>> BannersIds { get; set; }
 
-        public Index(List<string> categoryNames, List<List<string>> bannerData, List<List<int>> bannersIds)
+        public Index(List<string> categoryNames, List<List<string>> bannerData)
         {
             CategoryNames = categoryNames;
             BannerData = bannerData;
-            BannersIds = bannersIds;
         }
     }
 }

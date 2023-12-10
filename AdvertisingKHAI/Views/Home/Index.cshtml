@@ -1,62 +1,46 @@
 ﻿@model AdvertisingKHAI.Models.Home.Index
 
-<!-- Вміст сторінки -->
 <div id="banner-container">
-    <!-- Список компаній -->
     <div id="categoryList">
         <h2>Список категорій</h2>
         <ul id="categoryUl"></ul>
     </div>
 
-    <!-- Банер -->
     <div id="banner">
         <img id="imageId" alt="Рекламний банер">
     </div>
 </div>
 
-<!-- Таймер для зміни контенту банера (в даному прикладі кожні 5 секунд) -->
 <script>
     var imageElement = document.getElementById('imageId');
     var categoryNames = @Html.Raw(Json.Serialize(Model.CategoryNames));
     var bannerContent = @Html.Raw(Json.Serialize(Model.BannerContent));
 
+    //category index for view
     var currentCategoryIndex = 0;
+    //banner index for view
     var currentBannerIndex = 0;
 
+    //interval update
     function nextBanner() {
-        // Исправление: обновление индекса баннера внутри текущей категории
         currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
 
         var currentImage = document.getElementById('imageId');
 
-        // Обновление src из модели
         currentImage.src = bannerContent[currentCategoryIndex][currentBannerIndex];
     }
 
-    function setBanner() {
-        // Исправление: обновление индекса баннера внутри текущей категории
-        currentBannerIndex;
-
-        var currentImage = document.getElementById('imageId');
-
-        // Обновление src из модели
-        currentImage.src = bannerContent[currentCategoryIndex][currentBannerIndex];
-    }
-
-
-    // Оновлення списку категорій
     function updateCategoryList() {
         var categoryUl = document.getElementById('categoryList').getElementsByTagName('ul')[0];
-        categoryUl.innerHTML = ''; // Очистити список перед оновленням
+        categoryUl.innerHTML = ''; //clean ul
 
-
-        // Створити кнопку для кожної категорії
+        //create button for all category
         categoryNames.forEach(function (category, index) {
             var li = document.createElement('li');
             var button = document.createElement('button');
             button.textContent = category;
 
-            // Додати стилі до кнопок
+            //add style
             button.style.backgroundColor = 'none';
             button.style.border = 'none';
             button.style.padding = '0';
@@ -65,6 +49,7 @@
             button.style.opacity = '0.7';
             button.style.transition = 'opacity 0.3s ease';
 
+            //add function
             button.onclick = function () {
                 changeCategory(index);
             };
@@ -74,7 +59,7 @@
         });
     }
 
-
+    //update banner for category
     function changeCategory(categoryIndex) {
         currentCategoryIndex = categoryIndex;
         currentBannerIndex = 0;
@@ -87,7 +72,9 @@
     }
 
     setInterval(nextBanner, 1000);
-    // Викликати функцію для початкового оновлення списку категорій
+    //update category on start
     updateCategoryList();
-    setBanner();
+    var currentImage = document.getElementById('imageId');
+    //update bunner on start
+    currentImage.src = bannerContent[currentCategoryIndex][currentBannerIndex];
 </script>

@@ -28,7 +28,6 @@
 <script>
     var imageElement = document.getElementById('imageId');
     var bannerContent = @Html.Raw(Json.Serialize(Model.BannerData));
-    var bannerIds = @Html.Raw(Json.Serialize(Model.BannersIds));
     var categoryNames = @Html.Raw(Json.Serialize(Model.CategoryNames));
 
     var currentCategoryIndex = 0;

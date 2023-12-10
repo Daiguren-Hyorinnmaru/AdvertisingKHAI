@@ -26,6 +26,7 @@ namespace AdvertisingKHAI.Controllers
         public IActionResult Index()
         {
             string? UserName = User?.Identity?.Name;
+
             if (UserName != null)
             {
                 List<string> categoryNames = new();
@@ -40,37 +41,30 @@ namespace AdvertisingKHAI.Controllers
                     categoryNames = company.Category.Select(c => c.Name).ToList();
 
                     if (categoryNames != null)
-                        bannerContent = _context.Categories.Include(c => c.Banners)
-                        .Select(c => c.Banners.Where(b => b.Company.Name == UserName).ToList())
-                        .ToList();
-                }
-                List<List<string>> bannerData = new();
-                List<List<int>> bannersIds = new();
-
-                foreach (List<Banner> categoryBanner in bannerContent)
-                {
-                    List<string> bannerCategoryString64Data = new();
-                    List<int> bannerCategoryID = new();
-
-                    foreach (Banner banner in categoryBanner)
                     {
-                        string base64String = "data:image/jpg;base64," + Convert.ToBase64String(banner.ImageData);
-                        bannerCategoryString64Data.Add(base64String);
-                        //Console.WriteLine("banner.ImageData " + banner.ImageData+ " - "+Convert.ToBase64String(banner.ImageData));
-                        //Console.WriteLine();
-                        bannerCategoryID.Add(banner.Id);
+                        bannerContent = _context.Categories.Include(c => c.Banners)
+                        .Select(c => c.Banners.Where(b => b.Company != null && b.Company.Name == UserName).ToList())
+                        .ToList();
+
+                        List<List<string>> bannerData = new();
+
+                        foreach (List<Banner> categoryBanner in bannerContent)
+                        {
+                            List<string> bannerCategoryString64Data = new();
+
+                            foreach (Banner banner in categoryBanner)
+                            {
+                                //convert string for browser
+                                string base64String = "data:image/jpg;base64," + Convert.ToBase64String(banner.ImageData);
+                                bannerCategoryString64Data.Add(base64String);
+                            }
+                            bannerData.Add(bannerCategoryString64Data);
+                        }
+
+                        Models.Account.Index model = new(categoryNames, bannerData);
+
+                        return View(model);
                     }
-                    bannersIds.Add(bannerCategoryID);
-                    bannerData.Add(bannerCategoryString64Data);
-                }
-
-                if (categoryNames != null)
-                {
-                    Models.Account.Index model = new(categoryNames, bannerData, bannersIds);
-
-                    foreach (string name in categoryNames) { Console.WriteLine(name); }
-
-                    return View(model);
                 }
             }
             return View();
@@ -104,34 +98,26 @@ namespace AdvertisingKHAI.Controllers
 
             if (UserName != null)
             {
-                //Console.WriteLine("UserName != null");
                 Company? company = _context.Companies
                     .Include(c => c.Category)
                     .SingleOrDefault(c => c.Name == UserName);
 
                 if (company != null)
                 {
-                    //Console.WriteLine("company != null");
-
                     Category? categoryToRemove = company.Category.SingleOrDefault(c => c.Name == category.CategoryName);
 
                     if (categoryToRemove != null)
                     {
+                        //search for all company banners in a category
                         List<Banner> bannersToDelete =
                             _context.Banners.Where(b => b.CategoryID == categoryToRemove.ID && b.CompanyID == company.ID).ToList();
-                        //Console.WriteLine("CATEGORY TO REMOVE NAME " + categoryToRemove.Name);
-                        //Console.WriteLine("CATEGORY TO REMOVE NAME ID" + categoryToRemove.ID);
-                        //Console.WriteLine("COUNT TO DELETE " + bannersToDelete.Count());
-                        //Console.WriteLine("REMUVE START");
-                        //Console.WriteLine("categoryToRemove != null");
 
+                        //remuve list banners
                         foreach (Banner banner in bannersToDelete)
                         {
                             Console.WriteLine(banner.ImageName);
                             categoryToRemove.Banners.Remove(banner);
-
                         }
-                        //Console.WriteLine("REMUVE END");
 
                         company.Category.Remove(categoryToRemove);
 
@@ -149,10 +135,6 @@ namespace AdvertisingKHAI.Controllers
         [HttpPost]
         public IActionResult AddBanner([FromBody] BannerAddModel banner)
         {
-            //Console.WriteLine("AddBanner Start");
-            //Console.WriteLine("banner.CategoryName " + banner.CategoryName);
-            //Console.WriteLine("banner.ImageName " + banner.ImageName);
-            //Console.WriteLine("banner.ImageData " + banner.ImageData);
             string? UserName = User?.Identity?.Name;
 
             if (UserName != null)
@@ -169,14 +151,17 @@ namespace AdvertisingKHAI.Controllers
 
                     if (category != null)
                     {
-                        string prefixToRemove = "data:image/jpeg;base64,";
-                        if (!banner.ImageData.StartsWith(prefixToRemove))
-                            prefixToRemove = "data:image/jpg;base64,";
-                        banner.ImageData = banner.ImageData.Substring(prefixToRemove.Length);
-                        byte[] byteArray = Convert.FromBase64String(banner.ImageData);
-                        //Console.WriteLine("banner.ImageData Remove " + banner.ImageData);
+                        byte[] byteArray;
+                        //convert data banner to db
+                        {
+                            string prefixToRemove = "data:image/jpeg;base64,";
+                            if (!banner.ImageData.StartsWith(prefixToRemove))
+                                prefixToRemove = "data:image/jpg;base64,";
+                            banner.ImageData = banner.ImageData[prefixToRemove.Length..];
+                            byteArray = Convert.FromBase64String(banner.ImageData);
+                        }
 
-                        Banner newBanner = new Banner
+                        Banner newBanner = new()
                         {
                             ImageData = byteArray,
                             ImageName = banner.ImageName,
@@ -197,15 +182,18 @@ namespace AdvertisingKHAI.Controllers
         [HttpPost]
         public IActionResult DeleteBanner([FromBody] BannerDeleteModel banner)
         {
+            byte[] byteArray;
             string? UserName = User?.Identity?.Name;
-            string prefixToRemove = "data:image/jpeg;base64,";
-            if (!banner.ImageData.StartsWith(prefixToRemove))
-                prefixToRemove = "data:image/jpg;base64,";
-            banner.ImageData = banner.ImageData.Substring(prefixToRemove.Length);
-            byte[] byteArray = Convert.FromBase64String(banner.ImageData);
-
+            //convert data banner to db
+            {
+                string prefixToRemove = "data:image/jpeg;base64,";
+                if (!banner.ImageData.StartsWith(prefixToRemove))
+                    prefixToRemove = "data:image/jpg;base64,";
+                banner.ImageData = banner.ImageData[prefixToRemove.Length..];
+                byteArray = Convert.FromBase64String(banner.ImageData);
+            }
             Banner? deleteBanner = _context.Banners
-                .SingleOrDefault(c => c.Category.Name == banner.CategoryName && c.ImageData == byteArray);
+                .SingleOrDefault(c => c.Category != null && c.Category.Name == banner.CategoryName && c.ImageData == byteArray);
 
             if (deleteBanner != null)
             {
@@ -220,11 +208,12 @@ namespace AdvertisingKHAI.Controllers
         public IActionResult GetCompanyInfo()
         {
             List<Claim> companyInfo = User.Claims.ToList();
-            if(companyInfo.Count == 0)
+            if (companyInfo.Count == 0)
             {
                 return BadRequest();
             }
-            List<string> strings = new List<string>();
+
+            List<string> strings = new();
 
             foreach (Claim claim in companyInfo)
             {
