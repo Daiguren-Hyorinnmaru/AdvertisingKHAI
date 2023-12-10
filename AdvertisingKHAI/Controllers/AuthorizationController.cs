@@ -39,9 +39,9 @@ namespace AdvertisingKHAI.Controllers
                 // Если учетные данные верны, создайте утверждения (claims) пользователя
                 List<Claim> claims = new()
                 {
-                     new Claim(ClaimTypes.Name, model.Name),
-                     new Claim(ClaimTypes.Email, model.Email),
-                  // Добавьте другие утверждения по мере необходимости
+                     new Claim(ClaimTypes.Name, company.Name),
+                     new Claim(ClaimTypes.Email, company.Email),
+                     new Claim(ClaimTypes.MobilePhone, company.PhoneNumber)
                 };
 
                 var identity = new ClaimsIdentity(claims, "CookieAuthentication");

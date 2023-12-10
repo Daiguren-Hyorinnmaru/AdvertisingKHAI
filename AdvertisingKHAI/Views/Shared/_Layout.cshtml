@@ -7,6 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - AdvertisingKHAI</title>
     <link rel="stylesheet" href="~/AdvertisingKHAI.styles.css" />
+    <style>
+        .tooltip {
+            position: absolute;
+            z-index: 1;
+            display: none;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-width: 200px;
+        }
+
+        li:hover .tooltip {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -16,22 +32,25 @@
             </a>
             <div class="menu">
                 <ul>
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.Identity != null)
                     {
-                        <li>
-                            Company name: @User.Identity.Name
-                        </li>
-                        <li>
-                            <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Account" asp-action="Index">
-                                Управління рекламою
-                            </a>
-                        </li>
-                        <li>
-                            <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Logout">
-                                Вихід з аккаунту
-                            </a>
-                        </li>
-                    }
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li id="companyInfo">
+                                Company name: <span class="tooltip">@User.Identity.Name</span>
+                            </li>
+                            <li>
+                                <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Account" asp-action="Index">
+                                    Управління рекламою
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="" style="color: #4caf50; text-decoration: none;" asp-controller="Authorization" asp-action="Logout">
+                                    Вихід з аккаунту
+                                </a>
+                            </li>
+                        }
+                        }
                     else
                     {
                         <li>
@@ -56,3 +75,29 @@
     </div>
 </body>
 </html>
+
+<script>
+    $(document).ready(function () {
+        $("#companyInfo").hover(function () {
+            $.ajax({
+                url: "/Account/GetCompanyInfo",
+                type: "GET",
+                success: function (data) {
+                    // При успешном получении данных, отобразить их во всплывающем окне
+                    var tooltipText = "";
+
+                    // Перебираем массив строк и добавляем их к tooltipText
+                    data.forEach(function (item) {
+                        tooltipText += item + "<br>";
+                    });
+
+                    // Вместо text() используем html(), чтобы поддерживать переносы строк
+                    $(".tooltip").html(tooltipText);
+                },
+                error: function () {
+                    console.error("Ошибка при выполнении AJAX-запроса");
+                }
+            });
+        });
+    });
+</script>

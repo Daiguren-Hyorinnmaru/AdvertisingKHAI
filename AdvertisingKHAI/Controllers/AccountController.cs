@@ -7,6 +7,10 @@ using System.ComponentModel.Design;
 using System.Reflection;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
+using System.Globalization;
+using System.Security.Claims;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace AdvertisingKHAI.Controllers
 {
@@ -210,6 +214,24 @@ namespace AdvertisingKHAI.Controllers
             }
 
             return Ok("Banner added successfully.");
+        }
+
+        [HttpGet]
+        public IActionResult GetCompanyInfo()
+        {
+            List<Claim> companyInfo = User.Claims.ToList();
+            if(companyInfo.Count == 0)
+            {
+                return BadRequest();
+            }
+            List<string> strings = new List<string>();
+
+            foreach (Claim claim in companyInfo)
+            {
+                List<string> claimType = claim.Type.Split('/').ToList();
+                strings.Add(claimType.Last() + ": " + claim.Value.ToString());
+            }
+            return Json(strings);
         }
     }
 }
