@@ -2,10 +2,10 @@
 {
     public class Index
     {
-        public string[] CategoryNames { get; set; }
+        public List<string> CategoryNames { get; set; }
         public List<List<string>> BannerContent { get; set; }
 
-        public Index(string[] categoryName, List<List<string>> bannerContent)
+        public Index(List<string> categoryName, List<List<string>> bannerContent)
         {
             CategoryNames = categoryName;
             BannerContent = bannerContent;

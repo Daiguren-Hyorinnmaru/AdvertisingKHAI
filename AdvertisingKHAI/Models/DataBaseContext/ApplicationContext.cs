@@ -20,6 +20,15 @@ namespace AdvertisingKHAI.Models.DataBaseContext
             optionsBuilder.UseSqlite("Data Source=helloapp.db");
         }
 
+        public void RemoveCategoriesWithoutCompanies()
+        {
+            var categoriesWithoutCompanies = Categories
+                .Where(category => !Companies.Any(company => company.Category.Contains(category)))
+                .ToList();
+
+            Categories.RemoveRange(categoriesWithoutCompanies);
+            SaveChanges();
+        }
 
         public void ReBild()
         {
@@ -27,9 +36,10 @@ namespace AdvertisingKHAI.Models.DataBaseContext
             Database.EnsureCreated();
 
             List<Category> categorys = new();
-            categorys.Add(new Category { Name = "черный-красный-темн.красный" });
-            categorys.Add(new Category { Name = "желтый-синий-зеленый" });
-            categorys.Add(new Category { Name = "темн.зеленый-фиолетовый-темн.розовый" });
+            categorys.Add(new Category { Name = "Test 1" });
+            categorys.Add(new Category { Name = "Test 2" });
+            categorys.Add(new Category { Name = "Test 3" });
+            categorys.Add(new Category { Name = "baseTest" });
             Categories.AddRange(categorys);
             SaveChanges();
 
@@ -49,7 +59,7 @@ namespace AdvertisingKHAI.Models.DataBaseContext
 
             if (company != null)
             {
-                category = Categories.FirstOrDefault(c => c.Name == "черный-красный-темн.красный");
+                category = Categories.FirstOrDefault(c => c.Name == "Test 1");
                 if (category != null)
                 {
                     byte[] imageData1 = File.ReadAllBytes("wwwroot/banner1.jpg");
@@ -64,7 +74,7 @@ namespace AdvertisingKHAI.Models.DataBaseContext
                     SaveChanges();
                 }
 
-                category = Categories.FirstOrDefault(c => c.Name == "желтый-синий-зеленый");
+                category = Categories.FirstOrDefault(c => c.Name == "Test 2");
                 if (category != null)
                 {
                     byte[] imageData2 = File.ReadAllBytes("wwwroot/banner2.jpg");
@@ -79,7 +89,7 @@ namespace AdvertisingKHAI.Models.DataBaseContext
                     SaveChanges();
                 }
 
-                category = Categories.FirstOrDefault(c => c.Name == "черный-красный-темн.красный");
+                category = Categories.FirstOrDefault(c => c.Name == "Test 1");
                 if (category != null)
                 {
                     byte[] imageData3 = File.ReadAllBytes("wwwroot/banner3.jpg");
@@ -95,7 +105,7 @@ namespace AdvertisingKHAI.Models.DataBaseContext
                 }
 
 
-                category = Categories.FirstOrDefault(c => c.Name == "темн.зеленый-фиолетовый-темн.розовый");
+                category = Categories.FirstOrDefault(c => c.Name == "Test 3");
                 if (category != null)
                 {
                     byte[] imageData1_1 = File.ReadAllBytes("wwwroot/banner1_1.jpg");

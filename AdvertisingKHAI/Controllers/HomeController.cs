@@ -21,27 +21,40 @@ namespace AdvertisingKHAI.Controllers
         public IActionResult Index()
         {
             // Отримання масиву categoryNames з джерела даних (наприклад, з бази даних)
-            string[] categoryNames = _context.Categories.Select(c => c.Name).ToArray();
+            List<string> categoryNames = _context.Categories.Select(c => c.Name).ToList();
 
             List<List<byte[]>> bannerContent = _context.Categories
             .Include(c => c.Banners)
             .Select(c => c.Banners.Select(b => b.ImageData).ToList())
             .ToList();
 
-            List<List<string>> bannerContentTo = new List<List<string>>();
+            List<List<string>> bannerStringContent = new List<List<string>>();
 
-            foreach (var innerList in bannerContent)
+            foreach (List<byte[]> innerList in bannerContent)
             {
                 List<string> convertedInnerList = new List<string>();
-                foreach (var item in innerList)
+                foreach (byte[] item in innerList)
                 {
-                    string base64String = "data:image/png;base64," + Convert.ToBase64String(item);
+                    string base64String = "data:image/jpg;base64," + Convert.ToBase64String(item);
                     convertedInnerList.Add(base64String);
                 }
-                bannerContentTo.Add(convertedInnerList);
+                //Console.WriteLine(convertedInnerList.Count);
+                bannerStringContent.Add(convertedInnerList);
             }
 
-            Models.Home.Index model = new(categoryNames, bannerContentTo);
+            List<List<string>> bannerContentToModel = new List<List<string>>();
+            List<string> categoryNamesToModel = new List<string>();
+
+            for (int i = 0; i < bannerStringContent.Count(); i++)
+            {
+                if (bannerStringContent[i].Count > 0)
+                {
+                    bannerContentToModel.Add(bannerStringContent[i]);
+                    categoryNamesToModel.Add(categoryNames[i]);
+                }
+            }
+
+            Models.Home.Index model = new(categoryNamesToModel, bannerContentToModel);
 
             return View(model);
         }

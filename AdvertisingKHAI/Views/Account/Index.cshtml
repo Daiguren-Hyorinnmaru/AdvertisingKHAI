@@ -1,0 +1,203 @@
+﻿@model AdvertisingKHAI.Models.Account.Index
+﻿<div id="banner-container">
+
+    <div id="categoryList">
+        <h2>Список категорій</h2>
+        <ul id="categoryList">
+            <!-- Categories will be dynamically added here -->
+        </ul>
+        <button onclick="addCategory()">Додати категорію</button>
+        <button onclick="deleteCategory()">Видалити категорію</button>
+    </div>
+
+    <div id="banner">
+        <div>
+            <img id="imageId" alt="Категорія пуста">
+        </div>
+        <div>
+            <button onclick="prevBanner()">Попередній банер</button>
+            <button onclick="nextBanner()">Наступний банер</button>
+        </div>
+        <div style="padding-top: 10px;">
+            <button onclick="addBanner()">Додати банер до категорії</button>
+            <button onclick="deleteBanner()">Видалити поточний банер</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var imageElement = document.getElementById('imageId');
+    var bannerContent = @Html.Raw(Json.Serialize(Model.BannerData));
+    var bannerIds = @Html.Raw(Json.Serialize(Model.BannersIds));
+    var categoryNames = @Html.Raw(Json.Serialize(Model.CategoryNames));
+
+    var currentCategoryIndex = 0;
+    var currentBannerIndex = 0;
+
+    function changeCategory(categoryIndex) {
+        currentCategoryIndex = categoryIndex;
+        currentBannerIndex = 0;
+        updateBanner();
+    }
+
+    function updateBanner() {
+        if (bannerContent[currentCategoryIndex][currentBannerIndex]) {
+        }
+        else {
+            currentBannerIndex = 0;
+        }
+        imageElement.src = bannerContent[currentCategoryIndex][currentBannerIndex];
+    }
+
+    function prevBanner() {
+        currentBannerIndex = (currentBannerIndex - 1 + bannerContent[currentCategoryIndex].length) % bannerContent[currentCategoryIndex].length;
+        updateBanner();
+    }
+
+    function nextBanner() {
+        currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
+        updateBanner();
+    }
+
+    function addBanner() {
+        // Создаем input элемент для выбора файла
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        // Определяем обработчик события изменения значения input
+        input.addEventListener('change', function () {
+            var file = input.files[0]; // Получаем первый выбранный файл
+            if (file) {
+                var fileName = file.name; // Имя файла
+
+                // Проверяем формат файла
+                if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                    var reader = new FileReader();
+
+                    // Определяем обработчик события загрузки файла
+                    reader.onload = function (e) {
+                        var base64Data = e.target.result; // Данные файла в формате Base64
+                        // Ваши дальнейшие действия с именем файла (fileName) и данными (base64Data)
+                        
+                        $.ajax({
+                            type: 'POST',
+                            url: '/Account/AddBanner',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ 
+                                ImageName: fileName,
+                                ImageData: base64Data,
+                                CategoryName: categoryNames[currentCategoryIndex]
+                            }),
+                            success: function (response) {
+                                alert(response);
+                                window.location.reload();
+                            },
+                            error: function () {
+                                alert('Failed to add baner.');
+                            }
+                        });
+                    };
+
+                    // Читаем содержимое файла как Base64
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Выберите файл в формате JPG.');
+                }
+            }
+        });
+
+        // Запускаем окно выбора файла
+        input.click();
+    }
+
+    function deleteBanner() {
+        $.ajax({
+            type: 'POST',
+            url: '/Account/DeleteBanner',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                ImageData: bannerContent[currentCategoryIndex][currentBannerIndex],
+                CategoryName: categoryNames[currentCategoryIndex]
+            }),
+            success: function (response) {
+                alert(response);
+                window.location.reload();
+            },
+            error: function () {
+                alert('Failed to delete baner.');
+            }
+        });
+    }
+
+    function addCategory() {
+        var newCategoryName = prompt("Введіть назву нової категорії:");
+
+        if (newCategoryName) {
+            $.ajax({
+                type: 'POST',
+                url: '/Account/AddCategory',
+                contentType: 'application/json',
+                data: JSON.stringify({ categoryName: newCategoryName }),
+                success: function (response) {
+                    alert(response);
+                    window.location.reload();
+                },
+                error: function () {
+                    alert('Failed to add category.');
+                }
+            });
+        }
+    }
+
+    function deleteCategory() {
+        var newCategoryName = categoryNames[currentCategoryIndex];
+
+        if (newCategoryName) {
+            $.ajax({
+                type: 'POST',
+                url: '/Account/DeleteCategory',
+                contentType: 'application/json',
+                data: JSON.stringify({ categoryName: newCategoryName }),
+                success: function (response) {
+                    alert(response);
+                    window.location.reload();
+                },
+                error: function () {
+                    alert('Failed delete category.');
+                }
+            });
+        }
+    }
+
+    function updateCategoryList() {
+        var categoryUl = document.getElementById('categoryList').getElementsByTagName('ul')[0];
+        categoryUl.innerHTML = ''; // Очистити список перед оновленням
+
+        // Створити кнопку для кожної категорії
+        categoryNames.forEach(function (category, index) {
+            var li = document.createElement('li');
+            var button = document.createElement('button');
+            button.textContent = category;
+
+            // Додати стилі до кнопок
+            button.style.backgroundColor = 'none';
+            button.style.border = 'none';
+            button.style.padding = '0';
+            button.style.fontSize = '16px';
+            button.style.cursor = 'pointer';
+            button.style.opacity = '0.7';
+            button.style.transition = 'opacity 0.3s ease';
+
+            button.onclick = function () {
+                changeCategory(index);
+            };
+
+            li.appendChild(button);
+            categoryUl.appendChild(li);
+        });
+        changeCategory(0);
+        updateBanner();
+    }
+
+    updateCategoryList();
+</script>

@@ -10,7 +10,7 @@
 
     <!-- Банер -->
     <div id="banner">
-        <img id="imageId" src="banner1.jpg" alt="Рекламний банер">
+        <img id="imageId" alt="Рекламний банер">
     </div>
 </div>
 
@@ -26,6 +26,16 @@
     function nextBanner() {
         // Исправление: обновление индекса баннера внутри текущей категории
         currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
+
+        var currentImage = document.getElementById('imageId');
+
+        // Обновление src из модели
+        currentImage.src = bannerContent[currentCategoryIndex][currentBannerIndex];
+    }
+
+    function setBanner() {
+        // Исправление: обновление индекса баннера внутри текущей категории
+        currentBannerIndex;
 
         var currentImage = document.getElementById('imageId');
 
@@ -64,8 +74,6 @@
         });
     }
 
-    // Викликати функцію для початкового оновлення списку категорій
-    updateCategoryList();
 
     function changeCategory(categoryIndex) {
         currentCategoryIndex = categoryIndex;
@@ -79,4 +87,7 @@
     }
 
     setInterval(nextBanner, 1000);
+    // Викликати функцію для початкового оновлення списку категорій
+    updateCategoryList();
+    setBanner();
 </script>
