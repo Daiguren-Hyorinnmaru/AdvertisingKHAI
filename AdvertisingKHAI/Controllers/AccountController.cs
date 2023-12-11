@@ -27,10 +27,9 @@ namespace AdvertisingKHAI.Controllers
         {
             string? UserName = User?.Identity?.Name;
 
+
             if (UserName != null)
             {
-                List<string> categoryNames = new();
-                List<List<Banner>> bannerContent = new();
 
                 Company? company = _context.Companies
                     .Include(c => c.Category)
@@ -38,13 +37,18 @@ namespace AdvertisingKHAI.Controllers
 
                 if (company != null)
                 {
+                    List<string> categoryNames = new();
+                    List<List<Banner>> bannerContent = new();
                     categoryNames = company.Category.Select(c => c.Name).ToList();
 
                     if (categoryNames != null)
                     {
-                        bannerContent = _context.Categories.Include(c => c.Banners)
-                        .Select(c => c.Banners.Where(b => b.Company != null && b.Company.Name == UserName).ToList())
-                        .ToList();
+                        foreach (var categoryName in categoryNames)
+                        {
+                            bannerContent.Add(_context.Banners
+                                .Where(b => b.Company != null && b.Category != null && b.Company.Name == UserName && b.Category.Name == categoryName)
+                                .ToList());
+                        }
 
                         List<List<string>> bannerData = new();
 
@@ -151,15 +155,12 @@ namespace AdvertisingKHAI.Controllers
 
                     if (category != null)
                     {
-                        byte[] byteArray;
                         //convert data banner to db
-                        {
-                            string prefixToRemove = "data:image/jpeg;base64,";
-                            if (!banner.ImageData.StartsWith(prefixToRemove))
-                                prefixToRemove = "data:image/jpg;base64,";
-                            banner.ImageData = banner.ImageData[prefixToRemove.Length..];
-                            byteArray = Convert.FromBase64String(banner.ImageData);
-                        }
+                        string prefixToRemove = "data:image/jpeg;base64,";
+                        if (!banner.ImageData.StartsWith(prefixToRemove))
+                            prefixToRemove = "data:image/jpg;base64,";
+                        banner.ImageData = banner.ImageData[prefixToRemove.Length..];
+                        byte[] byteArray = Convert.FromBase64String(banner.ImageData);
 
                         Banner newBanner = new()
                         {
