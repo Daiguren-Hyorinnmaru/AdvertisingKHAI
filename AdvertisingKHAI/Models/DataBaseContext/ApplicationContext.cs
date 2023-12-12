@@ -51,7 +51,7 @@ namespace AdvertisingKHAI.Models.DataBaseContext
                 Name = "test",
                 Email = "test@t",
                 PhoneNumber = "+380996847850",
-                Password = "qwer",
+                Password = "qwerqwer",
                 Category = categorys
             };
             Companies.Add(companyTest);

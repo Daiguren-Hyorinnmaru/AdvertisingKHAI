@@ -27,7 +27,6 @@ namespace AdvertisingKHAI.Controllers
             return View();
         }
 
-        //почистить метод
         [HttpPost]
         public IActionResult Registration(Company model)
         {

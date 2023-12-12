@@ -6,21 +6,21 @@
     </div>
 }
 
-<form  asp-action="Registration" asp-controller="Authorization" method="post">
-    <label  for="name">Назва компанії (від 3 до 50 символів, тільки літери):</label>
-    <input  type="text" id="name" name="name" pattern="[A-Za-zА-Яа-яЁёіІїЇєЄґҐ\s]{3,50}" title="Введіть від 3 до 50 символів, тільки літери" required onblur="validateField('name')">
+<form asp-action="Registration" asp-controller="Authorization" method="post" onsubmit="return validateForm()">
+    <label for="name">Назва компанії (від 3 до 50 символів, тільки літери):</label>
+    <input type="text" id="name" name="name" pattern="[A-Za-zА-Яа-яЁёіІїЇєЄґҐ\s]{3,50}" title="Введіть від 3 до 50 символів, тільки літери" required onblur="validateField('name')">
 
     <label for="email">Електронна пошта:</label>
-    <input  type="email" id="email" name="email" required onblur="validateField('email')">
+    <input type="email" id="email" name="email" required onblur="validateField('email')">
 
     <label for="phonenumber">Телефон компанії (український формат):</label>
-    <input  type="tel" id="phonenumber" name="phonenumber" pattern="^\+380\d{9}$" title="Введіть український номер телефону, наприклад, +380123456789" required onblur="validateField('phonenumber')">
+    <input type="tel" id="phonenumber" name="phonenumber" pattern="^\+380\d{9}$" title="Введіть український номер телефону, наприклад, +380123456789" required onblur="validateField('phonenumber')">
 
     <label for="password">Пароль (мінімум 8 символів):</label>
-    <input type="password" id="password" name="password" pattern=".{4,}" title="Введіть мінімум 8 символів" required onblur="validateField('password')">
+    <input type="password" id="password" name="password" pattern=".{8,}" title="Введіть мінімум 8 символів" required onblur="validateField('password')">
 
     <label for="confirmPassword">Підтвердження паролю:</label>
-    <input  type="password" id="confirmPassword" name="confirmPassword" required onblur="validateField('confirmPassword')">
+    <input type="password" id="confirmPassword" name="confirmPassword" required onblur="validateField('confirmPassword')">
 
     <button type="submit">Зареєструватися</button>
 </form>
@@ -40,25 +40,28 @@
         var password = document.getElementById("password");
         var confirmPassword = document.getElementById("confirmPassword");
 
-        // Перевірка, чи відповідає назва компанії формату
+        name.classList.remove("error");
+        password.classList.remove("error");
+        confirmPassword.classList.remove("error");
+
         if (!/^[A-Za-zА-Яа-яЁёіІїЇєЄґҐ\s]{3,50}$/.test(name.value)) {
             name.classList.add("error");
             alert("Назва компанії повинна бути від 3 до 50 символів, тільки літери.");
             return false;
-        } else {
-            name.classList.remove("error");
         }
 
-        // Перевірка, чи паролі співпадають
-        if (password.value !== confirmPassword.value) {
+        if (password.value.length < 8) {
             password.classList.add("error");
+            alert("Пароль мінімум 8 символів");
+            return false;
+        }
+
+        if (password.value !== confirmPassword.value) {
             confirmPassword.classList.add("error");
             alert("Паролі не співпадають.");
             return false;
-        } else {
-            password.classList.remove("error");
-            confirmPassword.classList.remove("error");
         }
+
         return true;
     }
 </script>

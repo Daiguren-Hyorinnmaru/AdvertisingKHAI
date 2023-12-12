@@ -30,6 +30,18 @@
         currentImage.src = bannerContent[currentCategoryIndex][currentBannerIndex];
     }
 
+    //update banner for category
+    function changeCategory(categoryIndex) {
+        currentCategoryIndex = categoryIndex;
+        currentBannerIndex = 0;
+        updateBanner();
+    }
+
+    function updateBanner() {
+        imageElement.src = bannerContent[currentCategoryIndex][currentBannerIndex];
+        currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
+    }
+
     function updateCategoryList() {
         var categoryUl = document.getElementById('categoryList').getElementsByTagName('ul')[0];
         categoryUl.innerHTML = ''; //clean ul
@@ -59,19 +71,7 @@
         });
     }
 
-    //update banner for category
-    function changeCategory(categoryIndex) {
-        currentCategoryIndex = categoryIndex;
-        currentBannerIndex = 0;
-        updateBanner();
-    }
-
-    function updateBanner() {
-        imageElement.src = bannerContent[currentCategoryIndex][currentBannerIndex];
-        currentBannerIndex = (currentBannerIndex + 1) % bannerContent[currentCategoryIndex].length;
-    }
-
-    setInterval(nextBanner, 1000);
+    setInterval(nextBanner, 5000);
     //update category on start
     updateCategoryList();
     var currentImage = document.getElementById('imageId');
